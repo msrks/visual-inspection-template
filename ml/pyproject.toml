@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "ml"
+version = "0.1.0"
+description = ""
+authors = ["msrks <mshrrks@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+opencv-python = "^4.7.0.72"
+albumentations = "^1.3.0"
+google-cloud-aiplatform = "^1.23.0"
+google-cloud-storage = "^2.7.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22"
+types-protobuf = "^4.22.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "mlops.main:mainTask"

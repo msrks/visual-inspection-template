@@ -1,0 +1,5 @@
+.venv/
+typings/
+__pycache__
+dataset/
+rawdata/

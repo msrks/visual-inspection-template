@@ -1,5 +1,6 @@
 {
   "eslint.workingDirectories": [{ "mode": "auto" }],
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "python.defaultInterpreterPath": "${workspaceFolder}/ml/.venv/bin/python"
 }

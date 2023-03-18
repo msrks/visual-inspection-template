@@ -1,5 +1,10 @@
 # Visual Inspection Template
 
+## Console
+
+- [gcp](https://console.cloud.google.com/vertex-ai?referrer=search&authuser=0&project=visual-inspection-template)
+- [firestore](https://console.firebase.google.com/u/0/project/visual-inspection-template/firestore/data/~2F?hl=ja)
+
 ## GitOps
 
 ```sh
