@@ -7,6 +7,7 @@
     "dev": "next dev",
     "build": "next build && next export",
     "start": "next start",
+    "start:emulators": "firebase emulators:start --import=./seed --export-on-exit=./seed",
     "lint": "next lint",
     "deploy": "npm run build && firebase deploy --only hosting",
     "deploy:rules": "npm run build && firebase deploy --only firestore:rules",

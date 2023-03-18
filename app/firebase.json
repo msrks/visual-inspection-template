@@ -14,5 +14,12 @@
   "hosting": {
     "public": "out",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+  },
+  "emulators": {
+    "functions": { "port": 9001 },
+    "firestore": { "port": 9002 },
+    "hosting": { "port": 9003 },
+    "ui": { "enabled": true },
+    "singleProjectMode": true
   }
 }
