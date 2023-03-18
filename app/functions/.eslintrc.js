@@ -11,6 +11,7 @@ module.exports = {
     "plugin:import/typescript",
     "google",
     "plugin:@typescript-eslint/recommended",
+    "prettier",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -27,6 +28,12 @@ module.exports = {
   rules: {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
-    "indent": ["error", 2]
+    "object-curly-spacing": ["error", "always"],
+    "indent": ["error", 2, {
+      "SwitchCase": 1,
+      "ignoredNodes": ["ConditionalExpression"],
+    }],
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "operator-linebreak": "off",
   },
 };
