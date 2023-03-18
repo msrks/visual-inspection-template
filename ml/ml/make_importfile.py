@@ -1,6 +1,6 @@
 import csv
 import os
-from mlops.config import BUCKET_NAME, TTV, Labels, LightingConditions
+from ml.config import BUCKET_NAME, TTV, Labels, LightingConditions
 
 
 def write_csv(fname: str, row_data: list[str]) -> None:

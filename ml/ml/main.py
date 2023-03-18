@@ -4,10 +4,10 @@ import os
 import random
 import shutil
 
-from mlops.config import TTV, BaseInDir, BaseOutDir, Labels, LightingConditions
-from mlops.augmentation import Transform
-from mlops.make_importfile import make_importfile
-from mlops.utils import get_filename, getFormatedJSTtime
+from ml.config import TTV, BaseInDir, BaseOutDir, Labels, LightingConditions
+from ml.augmentation import Transform
+from ml.make_importfile import make_importfile
+from ml.utils import get_filename, getFormatedJSTtime
 
 # TODO: rawdataは sdkでとってくる。
 
