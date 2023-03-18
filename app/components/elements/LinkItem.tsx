@@ -1,6 +1,6 @@
 import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import { ReactNode, FC } from "react";
-import Link from "../../src/Link";
+import Link from "./Link";
 
 interface Props {
   href: string;
