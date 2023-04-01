@@ -1,14 +1,27 @@
 import { db, func, v2 } from "./firebase";
 import { deleteDataset } from "./vertexai/dataset";
 import { deleteModel, exportModel, listModelEvaluation } from "./vertexai/model";
-import { listTrainingPipelines } from "./vertexai/pipeline";
+import { listTrainingPipelines, trainAutoMLImageClassification } from "./vertexai/pipeline";
 import { Model } from "./_types";
 
-export const updatemodels = v2.scheduler.onSchedule({ schedule: "0 * * * *" }, async () => {
-  const pipelines = await listTrainingPipelines();
-
+const trainModels = async () => {
+  // https://cloud.google.com/vertex-ai/docs/reference/rest/v1/PipelineState
   await Promise.all(
-    pipelines.map(async (p) => {
+    (
+      await db.collection("models").get()
+    ).docs
+      .map((d) => d.data() as Model)
+      .filter((m) => !m.modelId && !["PIPELINE_STATE_QUEUED", "PIPELINE_STATE_PENDING", "PIPELINE_STATE_RUNNING"].includes(m.state || ""))
+      .map(async (m) => await trainAutoMLImageClassification({ datasetId: m.datasetId }))
+  );
+};
+
+export const updatemodels = v2.scheduler.onSchedule({ schedule: "0 * * * *" }, async () => {
+  await trainModels();
+  await Promise.all(
+    (
+      await listTrainingPipelines()
+    ).map(async (p) => {
       const snap = await db.collection("models").where("datasetId", "==", p.datasetId).get();
       if (snap.docs.length === 0) return;
 

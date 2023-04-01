@@ -41,7 +41,7 @@ const columns = (
     },
     {
       field: "state",
-      headerName: "trainingState",
+      headerName: "trainingPipeline",
       minWidth: 110,
       valueGetter: (val) => val.value?.replace("PIPELINE_STATE_", "").toLowerCase(),
     },
@@ -99,15 +99,17 @@ const DetailPanel: FC<{ row: Model }> = ({ row }) => {
         - ImportFile : ⬇️
         <Link href={row.gcsSourceUri.replace("gs://", "https://storage.cloud.google.com/")}>{row.gcsSourceUri} </Link>
       </Typography>
-      <Typography fontSize={14}>
-        - datasetId : 🔗
-        <Link
-          href={`https://console.cloud.google.com/vertex-ai/locations/us-central1/datasets/${row.datasetId}/browse?project=${process.env.NEXT_PUBLIC_PROJECT_ID}`}
-          target="_blank"
-        >
-          {row.datasetId}
-        </Link>
-      </Typography>
+      {row.state !== "prepairing" && (
+        <Typography fontSize={14}>
+          - datasetId : 🔗
+          <Link
+            href={`https://console.cloud.google.com/vertex-ai/locations/us-central1/datasets/${row.datasetId}/browse?project=${process.env.NEXT_PUBLIC_PROJECT_ID}`}
+            target="_blank"
+          >
+            {row.datasetId}
+          </Link>
+        </Typography>
+      )}
       {row.modelId && (
         <Typography fontSize={14}>
           - modelId : 🔗

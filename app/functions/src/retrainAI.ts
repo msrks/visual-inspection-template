@@ -48,6 +48,7 @@ export const retrainAI = func.https.onCall(async ({ lightingCondition, dateRange
     numImages: urls.length,
     numDogs: urls.filter((url) => url.split(",").slice(-1)[0] === "dog").length,
     numCats: urls.filter((url) => url.split(",").slice(-1)[0] === "cat").length,
+    state: "prepairing",
   } as Model);
   return "";
 });
