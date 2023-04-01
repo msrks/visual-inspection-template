@@ -1,16 +1,16 @@
 import { Grid } from "@mui/material";
 import { NextPage } from "next";
 import FlexCard from "../components/elements/FlexCard";
-import SettingsView from "../components/templates/SettingsView";
+import TableModels from "../components/templates/TableModels";
 
-const Settings: NextPage = () => {
+const VertexAiDatasets: NextPage = () => {
   return (
     <Grid container spacing={2} justifyContent="center">
       <Grid item xs={12} md={12} lg={12}>
-        <FlexCard content={<SettingsView />} />
+        <FlexCard content={<TableModels />} />
       </Grid>
     </Grid>
   );
 };
 
-export default Settings;
+export default VertexAiDatasets;

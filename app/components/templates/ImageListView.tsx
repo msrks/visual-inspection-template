@@ -1,12 +1,12 @@
 import Typography from "@mui/material/Typography";
 import {
-  Button,
+  Box,
+  capitalize,
   Checkbox,
   CircularProgress,
   FormControlLabel,
   FormGroup,
   IconButton,
-  ImageList,
   ImageListItem,
   ImageListItemBar,
   Stack,
@@ -16,21 +16,21 @@ import {
 } from "@mui/material";
 import { ChangeEvent, FC, useState } from "react";
 import { collection, deleteDoc, DocumentReference, orderBy, Query, query, QuerySnapshot, updateDoc, where } from "firebase/firestore";
-import { Image } from "../../types/image";
+import { Image, lightingCondition } from "../../types/image";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Title from "../../components/elements/Title";
-import { Cancel, CheckCircle, Delete, Refresh } from "@mui/icons-material";
+import { Cancel, CheckCircle, Delete } from "@mui/icons-material";
 import { db } from "../../lib/firebase";
 import { red, cyan } from "@mui/material/colors";
 import { AdapterDateFns } from "@mui/x-date-pickers-pro/AdapterDateFns";
 import { DateRange, DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
+import { endOfDay } from "date-fns";
+import { Masonry } from "@mui/lab";
 
 const colorDict = (bool: boolean) => (bool ? cyan[600] : red[600]);
 
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
 interface Props {
-  lightingCondition: "domeLight" | "barLight";
+  lightingCondition: lightingCondition;
 }
 
 const ImageListView: FC<Props> = ({ lightingCondition }) => {
@@ -61,7 +61,6 @@ const operationModeList: OperationMode[] = ["pre", "pro"];
 const operationModeLabelDict = {
   pre: "プレ運用",
   pro: "本番運用",
-  test: "テスト運用",
 };
 
 const ImageListViewMain: FC<PropsMain> = ({ title, snap }) => {
@@ -79,7 +78,7 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap }) => {
 
   const filterdImages = images
     .filter((img) => dateRange[0] === null || dateRange[0] <= img.createdAt.toDate())
-    .filter((img) => dateRange[1] === null || dateRange[1] >= img.createdAt.toDate())
+    .filter((img) => dateRange[1] === null || endOfDay(dateRange[1]) >= img.createdAt.toDate())
     .filter((img) => filters.includes(img.operationMode as OperationMode));
 
   const updateFilter = (e: ChangeEvent<HTMLInputElement>) =>
@@ -93,17 +92,19 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap }) => {
 
   return (
     <>
-      <Stack mb={1} direction="row" alignItems="center">
+      <Stack mb={1} direction="row" alignItems="center" justifyContent="space-between">
         <Title>{title}</Title>
-        <FormGroup row sx={{ ml: "auto", mr: "20px" }}>
-          {operationModeList.map((key) => (
-            <FormControlLabel
-              key={key}
-              control={<Checkbox id={key} checked={filters.includes(key)} onChange={updateFilter} />}
-              label={operationModeLabelDict[key]}
-            />
-          ))}
-        </FormGroup>
+        {!sm && (
+          <FormGroup row sx={{ ml: "auto", mr: "20px" }}>
+            {operationModeList.map((key) => (
+              <FormControlLabel
+                key={key}
+                control={<Checkbox id={key} checked={filters.includes(key)} onChange={updateFilter} />}
+                label={operationModeLabelDict[key]}
+              />
+            ))}
+          </FormGroup>
+        )}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DateRangePicker
             calendars={1}
@@ -118,55 +119,54 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap }) => {
 
       {filterdImages.length === 0 && <Typography m="auto">⛔️ There is no images</Typography>}
       {filterdImages.length > 0 && (
-        <ImageList
-          sx={{ width: !sm ? 1000 : 300, height: 580, marginX: "auto", my: 0 }}
-          rowHeight={!sm ? 120 : 130}
-          cols={!sm ? 5 : 2}
-          gap={6}
-        >
-          {filterdImages.map((img, i) => (
-            <div key={i}>
-              <ImageListItem sx={{ overflow: "hidden" }}>
-                <img key="2" src={img.imagePath.replace("gs://", "https://storage.googleapis.com/")} alt="img" loading="lazy" />
-                {img.operationMode === "pre" && (
+        <Box mr={4}>
+          <Masonry columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 5 }} spacing={{ xs: 1 }}>
+            {/* <ImageList sx={{ width: !sm ? 1000 : 400, height: 580, marginX: "auto", my: 0 }} rowHeight={200} cols={!sm ? 5 : 2} gap={6}> */}
+            {filterdImages.map((img, i) => (
+              <div key={i}>
+                <ImageListItem sx={{ overflow: "hidden", maxHeight: "120px", minHeight: "80px" }}>
+                  <img key="2" src={`https://storage.googleapis.com/${img.bucket}/${img.dstPath}`} alt="img" loading="lazy" />
+                  {img.operationMode === "pre" && (
+                    <ImageListItemBar
+                      sx={{
+                        background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
+                      }}
+                      subtitle={"プレ運用"}
+                      position="top"
+                      actionIcon={
+                        <IconButton size="small" sx={{ color: "white" }} onClick={() => deleteDoc(img.ref)}>
+                          <Delete sx={{ fontSize: "18px" }} />
+                        </IconButton>
+                      }
+                    />
+                  )}
                   <ImageListItemBar
                     sx={{
-                      background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
+                      background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
                     }}
-                    subtitle={"プレ運用"}
-                    position="top"
+                    title={img.predLabel ? img.predLabel.toUpperCase() + ": " + img.predConfidence : img.humanLabel.toUpperCase()}
+                    subtitle={img.createdAt.toDate().toLocaleString()}
                     actionIcon={
-                      <IconButton size="small" sx={{ color: "white" }} onClick={() => deleteDoc(img.ref)}>
-                        <Delete sx={{ fontSize: "18px" }} />
-                      </IconButton>
+                      img.operationMode === "pro" ? (
+                        <IconButton
+                          sx={{
+                            color: img.humanLabel ? colorDict(img.predLabel === img.humanLabel) : "rgba(255, 255, 255, 0.54)",
+                          }}
+                          onClick={() => updateReview(img.ref, img)}
+                        >
+                          {img.predLabel === img.humanLabel ? <CheckCircle /> : <Cancel />}
+                        </IconButton>
+                      ) : (
+                        <></>
+                      )
                     }
                   />
-                )}
-                <ImageListItemBar
-                  sx={{
-                    background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
-                  }}
-                  title={img.predLabel ? img.predLabel.toUpperCase() + ": " + img.predConfidence : img.humanLabel.toUpperCase()}
-                  subtitle={img.createdAt.toDate().toLocaleString()}
-                  actionIcon={
-                    img.operationMode === "pro" ? (
-                      <IconButton
-                        sx={{
-                          color: img.humanLabel ? colorDict(img.predLabel === img.humanLabel) : "rgba(255, 255, 255, 0.54)",
-                        }}
-                        onClick={() => updateReview(img.ref, img)}
-                      >
-                        {img.predLabel === img.humanLabel ? <CheckCircle /> : <Cancel />}
-                      </IconButton>
-                    ) : (
-                      <></>
-                    )
-                  }
-                />
-              </ImageListItem>
-            </div>
-          ))}
-        </ImageList>
+                </ImageListItem>
+              </div>
+            ))}
+            {/* </ImageList> */}
+          </Masonry>
+        </Box>
       )}
     </>
   );

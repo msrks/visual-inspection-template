@@ -6,8 +6,12 @@ export interface Image {
   predConfidence: number;
   humanLabel: string;
   modelId: string;
-  imagePath: string;
+  // imagePath: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
   brokenImage?: boolean;
+  bucket: string;
+  dstPath: string;
 }
+
+export type lightingCondition = "original" | "converted";

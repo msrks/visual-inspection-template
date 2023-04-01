@@ -1,6 +1,14 @@
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
+// let app;
+// const cred = process.env.CRED_FILE_PATH;
+// console.log(cred);
+// if (cred) {
+//   app = initializeApp({ credential: cert(cred) });
+// } else {
+//   app = initializeApp();
+// }
 const app = initializeApp();
 const db = getFirestore(app);
 

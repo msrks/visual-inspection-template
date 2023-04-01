@@ -30,7 +30,7 @@ if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true") {
     const _config = require("../firebase.json");
     console.log(_config.emulators);
     connectFirestoreEmulator(db, "localhost", _config.emulators.firestore.port);
-    // connectStorageEmulator(storage, "localhost", _config.emulators.storage.port);
+    connectStorageEmulator(storage, "localhost", _config.emulators.storage.port);
     connectFunctionsEmulator(func, "localhost", _config.emulators.functions.port);
   } catch (e) {
     console.log(e);
