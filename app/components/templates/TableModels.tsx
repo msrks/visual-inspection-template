@@ -1,14 +1,15 @@
 import { FC } from "react";
 import Title from "../elements/Title";
-import { CircularProgress, Container, Stack, Typography } from "@mui/material";
+import { CircularProgress, Container, Stack, Typography, Button, IconButton } from "@mui/material";
 import { collection, deleteDoc, doc, orderBy, Query, query, QuerySnapshot } from "firebase/firestore";
 import { Model } from "../../types";
-import { db } from "../../lib/firebase";
+import { db, func } from "../../lib/firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { DataGridPro, GridActionsCellItem, GridColDef, GridCsvExportOptions, GridToolbar } from "@mui/x-data-grid-pro";
 import { format } from "date-fns";
 import Link from "../elements/Link";
-import { Delete } from "@mui/icons-material";
+import { Delete, Replay } from "@mui/icons-material";
+import { useHttpsCallable } from "react-firebase-hooks/functions";
 
 const TableModel: FC = () => {
   const q = query(collection(db, "models"), orderBy("createdAt", "desc")) as Query<Model>;
@@ -72,7 +73,8 @@ const columns = (
     {
       field: "dateRange",
       valueFormatter: (val) =>
-        val.value && `${format(new Date(val.value[0]) as Date, "yy/MM/dd")} ~ ${format(new Date(val.value[1]) as Date, "yy/MM/dd")}`,
+        val.value &&
+        `${format(new Date(val.value[0]) as Date, "yy/MM/dd")} ~ ${format(new Date(val.value[1]) as Date, "yy/MM/dd")}`,
       minWidth: 160,
     },
     {
@@ -132,7 +134,9 @@ const DetailPanel: FC<{ row: Model }> = ({ row }) => {
       {row.urlTflite && (
         <Typography fontSize={14}>
           - tfite : ⬇️
-          <Link href={row.urlTflite.replace("gs://", "https://storage.cloud.google.com/") + "/model.tflite"}>{row.urlTflite} </Link>
+          <Link href={row.urlTflite.replace("gs://", "https://storage.cloud.google.com/") + "/model.tflite"}>
+            {row.urlTflite}{" "}
+          </Link>
         </Typography>
       )}
     </Container>
@@ -140,10 +144,15 @@ const DetailPanel: FC<{ row: Model }> = ({ row }) => {
 };
 
 const TableModelMain: FC<Props> = ({ snap }) => {
+  const [execute, executing, error] = useHttpsCallable(func, "updateModelsOnCall");
+
   return (
     <>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
         <Title>AI Models</Title>
+        <IconButton disabled={executing} color="primary" onClick={async () => await execute()}>
+          <Replay />
+        </IconButton>
       </Stack>
       <DataGridPro
         autoHeight

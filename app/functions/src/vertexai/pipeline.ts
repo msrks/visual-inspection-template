@@ -49,6 +49,7 @@ export const trainAutoMLImageClassification = async ({ datasetId }: { datasetId:
           testFraction: 0.1,
         },
       },
+      modelToUpload: { displayName: Date.now().toString() },
     },
   });
 };
