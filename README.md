@@ -16,3 +16,39 @@ git add -A
 git commit -m "add: README.md"
 git push -u origin master
 ```
+
+## Dir Structure
+
+```txt
+% git ls-tree -r --name-only HEAD | tree --fromfile -L 3 -d
+.
+├── .vscode
+├── app
+│   ├── _sampleImages
+│   │   ├── barLight
+│   │   └── domeLight
+│   ├── components
+│   │   ├── elements
+│   │   ├── layouts
+│   │   ├── modules
+│   │   └── templates
+│   ├── contexts
+│   ├── db
+│   ├── functions
+│   │   └── src
+│   ├── lib
+│   ├── pages
+│   ├── public
+│   ├── types
+│   └── utils
+├── docs
+├── edge
+│   └── frontend
+│       ├── public
+│       ├── src
+│       └── types
+├── infra
+└── ml
+    └── ml-python
+        └── ml
+```
