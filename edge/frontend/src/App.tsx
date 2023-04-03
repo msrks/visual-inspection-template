@@ -13,7 +13,7 @@ import { useState } from "react";
 import { ImageView } from "./ImageView";
 import { ImageCaptures, Image, Label } from "../types";
 
-const baseUrl = "http://127.0.0.1:8000";
+const baseUrl = import.meta.env.VITE_URL;
 const sampleImage1 = {
   imagePath: `${baseUrl}/static/domeLight.png`,
   lightingCondition: "domeLight",
