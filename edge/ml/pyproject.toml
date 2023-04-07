@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "ml"
+version = "0.1.0"
+description = ""
+authors = ["msrks <mshrrks@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+pydantic = "^1.10.7"
+fastapi = "^0.95.0"
+uvicorn = { extras = ["standerd"], version = "^0.21.1" }
+opencv-python = "^4.7.0.72"
+tensorflow-macos = { version = "^2.12.0", platform = "darwin" }
+tensorflow = { version = "^2.12.0", platform = "linux" }
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "ml.main:start"
+
+[tool.black]
+line-length = 88
