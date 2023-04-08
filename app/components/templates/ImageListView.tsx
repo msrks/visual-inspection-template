@@ -1,24 +1,29 @@
 import Typography from "@mui/material/Typography";
 import {
+  Backdrop,
   Box,
   capitalize,
   Checkbox,
   CircularProgress,
+  Fade,
   FormControlLabel,
   FormGroup,
   IconButton,
   ImageListItem,
   ImageListItemBar,
+  Modal,
   Stack,
   TextField,
   Theme,
   useMediaQuery,
 } from "@mui/material";
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
+import { ChangeEvent, Dispatch, FC, MouseEvent, SetStateAction, useState } from "react";
 import {
   collection,
   deleteDoc,
+  doc,
   DocumentReference,
+  increment,
   limit,
   orderBy,
   Query,
@@ -35,8 +40,9 @@ import { db } from "../../lib/firebase";
 import { red, cyan } from "@mui/material/colors";
 import { AdapterDateFns } from "@mui/x-date-pickers-pro/AdapterDateFns";
 import { DateRange, DateRangePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
-import { endOfDay } from "date-fns";
+import { endOfDay, format } from "date-fns";
 import { Masonry } from "@mui/lab";
+import { utcToZonedTime } from "date-fns-tz";
 // import { InView, useInView } from "react-intersection-observer";
 
 const colorDict = (bool: boolean) => (bool ? cyan[600] : red[600]);
@@ -96,6 +102,8 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
   const [filters, setFilters] = useState<OperationMode[]>(operationModeList);
   const [dateRange, setDateRange] = useState<DateRange<Date>>([minDate, maxDate]);
   const sm = useMediaQuery((theme: Theme) => theme.breakpoints.down("lg"));
+  const [open, setOpen] = useState(false);
+  const [image, setImage] = useState("false");
 
   const filterdImages = images
     .filter((img) => dateRange[0] === null || dateRange[0] <= img.createdAt.toDate())
@@ -111,12 +119,32 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
     let humanLabel;
     if (!img.humanLabel) {
       humanLabel = img.predLabel;
+
+      if (img.lightingCondition === "original") {
+        const jstDate = utcToZonedTime(img.createdAt.toDate(), "Asia/Tokyo");
+        const jstString = format(jstDate, "yyyy-MM-dd");
+        await updateDoc(doc(db, `metrics/${jstString}`), {
+          updatedAt: new Date(),
+          numUnreviewed: increment(-1),
+        });
+      }
     } else {
       const index = labelList.indexOf(img.humanLabel);
       humanLabel = labelList[(index + 1) % labelList.length];
     }
 
     await updateDoc(ref, { humanLabel });
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleImage = (e: any, url: string) => {
+    if (["IMG", "DIV"].includes(e.target.tagName)) {
+      setImage(url);
+      setOpen(true);
+    }
   };
 
   // const refreshDateRange = () => setDateRange([minDate, maxDate]);
@@ -156,8 +184,17 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
               {/* <ImageList sx={{ width: !sm ? 1000 : 400, height: 580, marginX: "auto", my: 0 }} rowHeight={200} cols={!sm ? 5 : 2} gap={6}> */}
               {filterdImages.map((img, i) => (
                 <div key={i}>
-                  <ImageListItem sx={{ overflow: "hidden", maxHeight: "120px", minHeight: "80px" }}>
-                    <img key="2" src={`https://storage.googleapis.com/${img.bucket}/${img.dstPath}`} alt="img" loading="lazy" />
+                  <ImageListItem
+                    sx={{ overflow: "hidden", maxHeight: "120px", minHeight: "80px" }}
+                    onClick={(e) => handleImage(e, `https://storage.googleapis.com/${img.bucket}/${img.dstPath}`)}
+                    // onClick={(e) => handleImage()}
+                  >
+                    <img
+                      src={`https://storage.googleapis.com/${img.bucket}/${img.dstPath}`}
+                      alt="img"
+                      loading="lazy"
+                      // onClick={(e) => handleImage(`https://storage.googleapis.com/${img.bucket}/${img.dstPath}`)}
+                    />
                     {img.operationMode === "pre" && (
                       <ImageListItemBar
                         sx={{
@@ -206,6 +243,19 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
           {/* <InView onChange={(inView, entry) => inView && setPage((p) => p + 1)} /> */}
         </>
       )}
+
+      <Modal
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+        open={open}
+        onClose={handleClose}
+        // closeAfterTransition
+        // BackdropComponent={Backdrop}
+        // BackdropProps={{ timeout: 500 }}
+      >
+        {/* <Fade in={open} timeout={500}> */}
+        <img src={image} alt="img" loading="lazy" style={{ maxHeight: "50%", outline: "none" }} />
+        {/* </Fade> */}
+      </Modal>
     </div>
   );
 };
