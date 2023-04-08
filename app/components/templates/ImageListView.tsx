@@ -82,6 +82,8 @@ const operationModeLabelDict = {
   pro: "本番運用",
 };
 
+const labelList = ["dog", "cat"];
+
 const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
   const images = snap.docs.map((doc) => ({
     ...doc.data(),
@@ -105,8 +107,16 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
       ? setFilters([...filters, e.target.id as OperationMode])
       : setFilters(filters.filter((key) => key !== e.target.id));
 
-  const updateReview = (ref: DocumentReference<Image>, img: Image) => {
-    updateDoc(ref, { humanLabel: img.humanLabel === "ok" ? "ng" : img.humanLabel === "ng" ? "ok" : img.predLabel });
+  const updateReview = async (ref: DocumentReference<Image>, img: Image) => {
+    let humanLabel;
+    if (!img.humanLabel) {
+      humanLabel = img.predLabel;
+    } else {
+      const index = labelList.indexOf(img.humanLabel);
+      humanLabel = labelList[(index + 1) % labelList.length];
+    }
+
+    await updateDoc(ref, { humanLabel });
   };
 
   // const refreshDateRange = () => setDateRange([minDate, maxDate]);
@@ -167,7 +177,9 @@ const ImageListViewMain: FC<PropsMain> = ({ title, snap, setPage }) => {
                         background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
                       }}
                       title={
-                        img.predLabel ? img.predLabel.toUpperCase() + ": " + img.predConfidence : img.humanLabel.toUpperCase()
+                        img.predLabel
+                          ? img.predLabel.toUpperCase() + ": " + img.predConfidence.toFixed(2)
+                          : img.humanLabel.toUpperCase()
                       }
                       subtitle={img.createdAt.toDate().toLocaleString()}
                       actionIcon={
