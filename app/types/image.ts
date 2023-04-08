@@ -9,9 +9,9 @@ export interface Image {
   // imagePath: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  brokenImage?: boolean;
   bucket: string;
   dstPath: string;
+  imageId: string;
 }
 
 export type lightingCondition = "original" | "converted";

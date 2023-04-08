@@ -2,13 +2,13 @@ export interface Image {
   lightingCondition: string;
   predLabel?: string;
   predConfidence?: number;
-  humanLabel: string;
+  humanLabel?: string;
   modelId?: string;
   createdAt: Date;
   updatedAt: Date;
-  brokenImage?: boolean;
   bucket: string;
   dstPath: string;
+  imageId: string;
 }
 
 export type LightingCondition = "original" | "converted";
@@ -30,3 +30,17 @@ export interface Model {
   urlTflite?: string;
   urlSavedModel?: string;
 }
+
+export type Animal = "dog" | "cat";
+
+export interface PredResponse {
+  confidences: Confidences;
+  result: Animal;
+}
+
+export interface Confidences {
+  dog: number;
+  cat: number;
+}
+
+export type LabelingMethod = "humanLabeling" | "aiLabeling";
