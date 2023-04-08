@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { db, func, v2 } from "./firebase";
 import { FieldValue } from "firebase-admin/firestore";
 import { utcToZonedTime } from "date-fns-tz";
+import { Image } from "./_types";
 
 // export const createMetrics = func.pubsub
 //   .schedule("0 0 * * *")
@@ -32,6 +33,7 @@ export const createmetrics = v2.scheduler.onSchedule(
     v2.logger.info(`create: ${jstString}`);
     await db.doc(`metrics/${jstString}`).set({
       num: 0,
+      numUnreviewed: 0,
       date: jstString,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -39,10 +41,17 @@ export const createmetrics = v2.scheduler.onSchedule(
   }
 );
 
-export const updateMetrics = func.firestore.document("/images/{imageId}").onCreate(async () => {
+export const updateMetrics = func.firestore.document("/images/{imageId}").onCreate(async (snap) => {
+  const img = snap.data() as Image;
+
+  if (img.lightingCondition !== "original") return;
+
   const jstString = getJstString();
   await db.doc(`metrics/${jstString}`).update({
     num: FieldValue.increment(1),
     updatedAt: new Date(),
+    ...(!img.humanLabel && { numUnreviewed: FieldValue.increment(1) }),
   });
+
+  return;
 });

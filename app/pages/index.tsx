@@ -1,8 +1,8 @@
 import { Grid } from "@mui/material";
 import { NextPage } from "next";
 import FlexCard from "../components/elements/FlexCard";
+import NumberOfUnreviewed from "../components/templates/NumberOfUnreviewed";
 import NumberOfInspections from "../components/templates/NumberOfInspections";
-import OkNgRatio from "../components/templates/OkNgRatio";
 
 const Metrics: NextPage = () => {
   return (
@@ -11,7 +11,7 @@ const Metrics: NextPage = () => {
         <FlexCard content={<NumberOfInspections />} />
       </Grid>
       <Grid item xs={12} md={12} lg={12}>
-        <FlexCard content={<OkNgRatio />} />
+        <FlexCard content={<NumberOfUnreviewed />} />
       </Grid>
     </Grid>
   );

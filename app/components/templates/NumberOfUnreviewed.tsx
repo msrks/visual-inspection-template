@@ -3,26 +3,34 @@ import Title from "../elements/Title";
 import { Stack } from "@mui/material";
 import ChartBar from "../elements/ChartBar";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { collection, orderBy, Query, query } from "firebase/firestore";
+import { collection, doc, orderBy, Query, query, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Metrics } from "../../types";
 
-const NumberOfInspections: FC = () => {
+// const fixMetricsDocs = async (date: string) => {
+//   await updateDoc(doc(db, `metrics/${date}`), {
+//     numUnreviewed: 0,
+//   });
+// };
+
+const NumberOfUnreviewed: FC = () => {
   const q = query(collection(db, "metrics"), orderBy("createdAt", "asc")) as Query<Metrics>;
   const [metrics, loading, error] = useCollectionData<Metrics>(q);
 
   const dataset =
     metrics?.map((m) => ({
-      value: m.num,
+      value: m.numUnreviewed,
       date: m.date,
     })) || [];
 
-  // console.log(dataset);
+  console.log(dataset);
+
+  // metrics?.forEach((m) => fixMetricsDocs(m.date));
 
   return (
     <>
       <Stack direction="row" justifyContent="space-between">
-        <Title>Inspection</Title>
+        <Title>Unreviewed Images</Title>
       </Stack>
       {dataset.length > 0 && (
         <Stack height={200}>
@@ -33,4 +41,4 @@ const NumberOfInspections: FC = () => {
   );
 };
 
-export default NumberOfInspections;
+export default NumberOfUnreviewed;
