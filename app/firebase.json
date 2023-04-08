@@ -13,7 +13,30 @@
   ],
   "hosting": {
     "public": "out",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/predict",
+        "run": {
+          "serviceId": "edge-ml",
+          "region": "asia-northeast1"
+        }
+      },
+      {
+        "source": "/docs",
+        "run": {
+          "serviceId": "edge-ml",
+          "region": "asia-northeast1"
+        }
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/openapi.json",
+        "destination": "https://edge-ml-tqpferbhdq-an.a.run.app/openapi.json",
+        "type": 302
+      }
+    ]
   },
   "emulators": {
     "functions": { "port": 9001 },
