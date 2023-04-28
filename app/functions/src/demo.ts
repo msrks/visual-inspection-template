@@ -105,6 +105,6 @@ export const fetchmultipleimages = func.https.onCall(async (num: number) => {
   );
 });
 
-export const fetcheveryhour = v2.scheduler.onSchedule({ schedule: "30 * * * *" }, async () => {
+export const fetcheveryhour = v2.scheduler.onSchedule({ schedule: "30 0 * * *" }, async () => {
   await doDemoJob("aiLabeling");
 });
